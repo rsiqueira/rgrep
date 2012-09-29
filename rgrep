@@ -13,7 +13,9 @@
 #
 # Finds the string 'function' in all files (recursively in subdirectories)
 # rgrep 'function'
-
+#
+# GITHUB PROJECT:
+# https://github.com/rsiqueira/rgrep
 
 use strict;
 use Term::ANSIColor;
