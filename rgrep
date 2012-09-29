@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+
+# rgrep - Grep a string in multiple subdirectories
+#
+# Creation date: 2012-09-29
+# Created by: Rodrigo Siqueira (rsiqueira at gmail.com)
+#
+# Usage: rgrep 'string' .extension
+#
+# E.g:
+# Finds the string 'function' in php files only (recursively in subdirectories):
+# rgrep 'function' .php
+#
+# Finds the string 'function' in all files (recursively in subdirectories)
+# rgrep 'function'
+
+
+use strict;
+use Term::ANSIColor;
+$|=1;
+
+my $string = shift;
+
+my $grep_params;
+if ($string =~ /^(\-\w)$/) { # rgrep -i
+  $grep_params = $1; # Ex: "-i"
+  $string = shift;
+}
+
+my $extension = shift;
+my $extra_files = shift;
+
+if ($extra_files) {
+  print STDERR "(do not use '*' in filename or extension)\n";
+  $string = ''; # to die
+}
+
+if (!$string) {
+  die "Usage: rgrep 'string' .ext\n";
+}
+
+$string =~ s/'/\'/gs; # Escape single quotes
+
+# Will not print ANSI colors if the output is not to the terminal (TTY), e.g. "rgrep ... > out.txt"
+my $is_opened_to_tty=0;
+if (-t STDOUT) {
+  $is_opened_to_tty = 1;
+}
+
+$grep_params .= ' -H'; # -H = prints "filename:" before the matched string
+if ($is_opened_to_tty) {
+  $grep_params .= ' --color=always';
+}
+
+my $cmd = "find . -type f -name '*$extension' -exec grep $grep_params '$string' {} \\;";
+
+open(CMD, "$cmd|") || die "Can not execute command ($!)\n";
+
+$is_opened_to_tty && print STDERR color 'red';
+print STDERR $cmd . "\n";
+$is_opened_to_tty && print STDERR color 'reset';
+
+my $string_found;
+while (<CMD>) {
+  print;
+  $string_found++;
+}
+
+close CMD;
+
+if (!$string_found) {
+  print STDERR "String ($string) not found in files ($extension)\n";
+}
+
+### END ###
