@@ -3,4 +3,4 @@ rgrep
 
 grep recursively in all subdirectories
 
-![rgrep screenshot](rgrep-screenshot.png)
+![rgrep screenshot](https://raw.github.com/rsiqueira/rgrep/master/rgrep-screenshot.png)
